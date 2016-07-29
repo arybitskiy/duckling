@@ -296,6 +296,10 @@
   [#"(?i)the" (integer 1 31)]
   (assoc (day-of-month (:value %2)) :latent true)
 
+  "<named-day> <day-of-month> (ordinal)" ; Friday 18th
+  [{:form :day-of-week} (dim :ordinal #(<= 1 (:value %) 31))]
+  (intersect %1 (day-of-month (:value %2)))
+
   "<named-month> <day-of-month> (ordinal)" ; march 12th
   [{:form :month} (dim :ordinal #(<= 1 (:value %) 31))]
   (intersect %1 (day-of-month (:value %2)))
@@ -621,15 +625,19 @@
   [#"(?i)(anytime |sometimes? )?after" (dim :time)]
   (merge %2 {:direction :after})
 
+  "since <time-of-day>"
+  [#"(?i)since" (dim :time)]
+  (merge  (pred-nth %2 -1) {:direction :after})
+
   ; ;; In this special case, the upper limit is exclusive
   ; "<hour-of-day> - <hour-of-day> (interval)"
   ; [{:form :time-of-day} #"-|to|th?ru|through|until" #(and (= :time-of-day (:form %))
-  ; 									  (not (:latent %)))]
+  ;                                                         (not (:latent %)))]
   ; (interval %1 %3 :exclusive)
 
   ; "from <hour-of-day> - <hour-of-day> (interval)"
   ; [#"(?i)from" {:form :time-of-day} #"-|to|th?ru|through|until" #(and (= :time-of-day (:form %))
-  ; 									              (not (:latent %)))]
+  ;                                                                     (not (:latent %)))]
   ; (interval %2 %4 :exclusive)
 
   ; "time => time2 (experiment)"
